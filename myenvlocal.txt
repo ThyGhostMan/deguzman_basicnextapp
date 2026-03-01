@@ -3,6 +3,7 @@
 # Using Supabase Transaction Pooler (port 6543) or Session Pooler (port 5432)
 # Host aws-1-ap-northeast-1.pooler.supabase.com accepts the user postgres.ishuzczufkhdpnmseicj
 #---------supabase connection----------
+#---school account----
 #DB_HOST=aws-1-ap-south-1.pooler.supabase.com
 #DB_PORT=5432
 #DB_USER=postgres.gqhgcfofwpjvpsjdzhth

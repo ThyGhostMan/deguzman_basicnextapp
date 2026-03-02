@@ -15,20 +15,28 @@ const connectionConfig = {
     rejectUnauthorized: false, 
   },
   // Optimize for serverless: use fewer connections per instance to avoid exhaustion
-  max: isServerless ? 2 : 20,
-  idleTimeoutMillis: 30000,
+  max: isServerless ? 1 : 10, // Reduce max connections to 1 for Vercel to avoid "too many clients"
+  idleTimeoutMillis: 10000, // Close idle clients faster (10s) to avoid "Connection terminated" on stale connections
   // Allow slightly longer for initial connection in production
-  connectionTimeoutMillis: isServerless ? 15000 : 5000,
+  connectionTimeoutMillis: isServerless ? 10000 : 5000,
+  keepAlive: true, // Enable TCP keepalive
 };
 
 // Fallback to connection string if individual vars are missing but DATABASE_URL is present
-const finalConfig = (process.env.DB_HOST) 
+// We prioritize explicit host/user/pass configuration if fully available
+const useExplicitConfig = process.env.DB_HOST && process.env.DB_USER && process.env.DB_PASSWORD;
+
+const finalConfig = useExplicitConfig
   ? connectionConfig 
   : { 
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-      max: isServerless ? 2 : 20,
-      connectionTimeoutMillis: isServerless ? 15000 : 5000,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      max: isServerless ? 1 : 10,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: isServerless ? 10000 : 5000,
+      keepAlive: true,
     };
 
 // Always log config in production for debugging the "hang" issue
@@ -74,7 +82,18 @@ if (process.env.NODE_ENV !== 'production') {
 // Reusable query function
 // Using 'unknown' or a generic T instead of 'any'
 // ----------------------------
-export const query = <T extends QueryResultRow = QueryResultRow>(
+export const query = async <T extends QueryResultRow = QueryResultRow>(
   text: string, 
   params?: unknown[]
-): Promise<QueryResult<T>> => pool.query<T>(text, params);
+): Promise<QueryResult<T>> => {
+  try {
+    return await pool.query<T>(text, params);
+  } catch (error: any) {
+    // If connection terminated unexpectedly, retry once
+    if (error.message?.includes('Connection terminated') || error.code === '57P01') {
+      console.warn('⚠️ DB Connection terminated, retrying query...');
+      return await pool.query<T>(text, params);
+    }
+    throw error;
+  }
+};

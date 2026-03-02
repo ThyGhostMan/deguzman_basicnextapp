@@ -81,7 +81,11 @@ export default function LoginForm({ dbHost }: LoginFormProps) {
                  // Run diagnostics even on "Invalid email" to rule out connecting to wrong DB
                  const diagnosis = await checkDbConnection();
                  if (!diagnosis.success) {
-                     setDebugInfo(`DB Error: ${diagnosis.error} (Code: ${diagnosis.code})`);
+                     setDebugInfo(`DB Error: ${diagnosis.error} (Code: ${diagnosis.code}) 
+                     [Pass: ${diagnosis.env?.hasPassword ? 'Yes' : 'NO'}] 
+                     [URL: ${diagnosis.env?.hasUrl ? 'Yes' : 'NO'}]
+                     [Host: ${diagnosis.env?.host}] 
+                     [User: ${diagnosis.env?.user || 'MISSING'}]`);
                  } else {
                      setDebugInfo(`DB Connected: ${diagnosis.data?.current_database} @ ${diagnosis.env?.host} (User: ${diagnosis.data?.current_user})`);
                  }

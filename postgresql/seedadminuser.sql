@@ -1,3 +1,8 @@
+-- 0. Ensure the 'ADMINISTRATOR' role exists first
+INSERT INTO public.roles (id, description)
+VALUES ('ADMINISTRATOR', 'System Administrator')
+ON CONFLICT (id) DO NOTHING;
+
 -- 1. Insert the User (if they don't exist)
 -- Note: 'id' is a string to satisfy Better Auth
 -- 1. Insert admin user

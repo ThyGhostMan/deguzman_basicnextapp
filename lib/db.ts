@@ -25,6 +25,11 @@ const connectionConfig = {
 // Fallback to connection string if individual vars are missing but DATABASE_URL is present
 // We prioritize explicit host/user/pass configuration if fully available
 const useExplicitConfig = process.env.DB_HOST && process.env.DB_USER && process.env.DB_PASSWORD;
+const hasConfig = useExplicitConfig || process.env.DATABASE_URL;
+
+if (!hasConfig && process.env.NODE_ENV === 'production') {
+  console.warn("❌ CRITICAL: No database configuration found. Please set DB_HOST/DB_USER/DB_PASSWORD or DATABASE_URL environment variables.");
+}
 
 const finalConfig = useExplicitConfig
   ? connectionConfig 
@@ -40,7 +45,7 @@ const finalConfig = useExplicitConfig
     };
 
 // Always log config in production for debugging the "hang" issue
-console.log(`[DB Config] Host=${process.env.DB_HOST || 'via-url'}, User=${process.env.DB_USER}, SSL=${!!finalConfig.ssl}, Max=${finalConfig.max}, Timeout=${finalConfig.connectionTimeoutMillis}`);
+console.log(`[DB Config] Host=${process.env.DB_HOST || (process.env.DATABASE_URL ? 'via-url' : 'MISSING')}, User=${process.env.DB_USER || (process.env.DATABASE_URL ? 'via-url' : 'MISSING')}, SSL=${!!finalConfig.ssl}, Max=${finalConfig.max}, Timeout=${finalConfig.connectionTimeoutMillis}`);
 
 export const pool = globalForPool.pool || new Pool(finalConfig);
 

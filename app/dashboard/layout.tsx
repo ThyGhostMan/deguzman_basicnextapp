@@ -193,6 +193,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.push("/dashboard/admin/users");
       return;
     }
+    if (action === "Medical Test") {
+      router.push("/dashboard/admin/medicaltests");
+      return;
+    }
     await showMessage(`Clicked: ${action}`);
   };
 
@@ -217,8 +221,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const adminItems = [
     { label: "User Management", onClick: () => handleAction("User Management") },
-    // CHANGED: Removed router.push and replaced with handleAction to show the alert
     { label: "Role Management", onClick: () => handleAction("Role Management") },
+    { label: "Medical Test", onClick: () => handleAction("Medical Test") },
   ];
 
   const handleTimeoutLogout = async () => {

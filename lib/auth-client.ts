@@ -4,7 +4,8 @@ import { inferAdditionalFields } from "better-auth/client/plugins";
 import type { AuthOptions } from "./auth";
 
 export const authClient = createAuthClient({
-    baseURL: process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"),
+    // Prefer window.location.origin to avoid CORS when using multiple Vercel domains (e.g. preview vs production)
+    baseURL: typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
     plugins: [
         inferAdditionalFields<AuthOptions>()
     ],

@@ -1,10 +1,9 @@
-import { betterAuth, BetterAuthOptions } from "better-auth";
+import { betterAuth } from "better-auth";
 import { bearer } from "better-auth/plugins";
 import { pool } from "./db";
 
-export const authOptions = {
+export const auth = betterAuth({
     database: pool,
-
     user: { 
         modelName: "users",
         additionalFields: {
@@ -30,17 +29,14 @@ export const authOptions = {
     secret: process.env.BETTER_AUTH_SECRET,
 
     // ✅ Production / serverless settings
-    baseURL: process.env.BETTER_AUTH_URL, // Add this in Vercel env
+    baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
     trustedOrigins: [
         "http://localhost:3000",
         "https://basicnextapp.vercel.app",
+        "https://deguzman-basicnextapp.vercel.app",
     ],
-    // advanced: {
-    //     trustHost: true, // Important for Vercel proxy headers
-    // },
-} satisfies BetterAuthOptions;
-
-export const auth = betterAuth(authOptions);
+});
 
 export type Auth = typeof auth;
-export type AuthOptions = typeof authOptions;
+export const authOptions = auth.options;
+export type AuthOptions = typeof auth.options;

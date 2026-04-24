@@ -12,10 +12,10 @@ call npx vercel env rm NEXT_PUBLIC_APP_URL production --yes
 echo "Setting up NEW Vercel environment variables..."
 
 # Database
-call npx vercel env add DB_HOST production "aws-1-ap-south-1.pooler.supabase.com"
+call npx vercel env add DB_HOST production "aws-1-ap-southeast-1.pooler.supabase.com"
 call npx vercel env add DB_PORT production "5432"
-call npx vercel env add DB_USER production "postgres.gqhgcfofwpjvpsjdzhth"
-call npx vercel env add DB_PASSWORD production "ww3Jd6TPh94rl3PT"
+call npx vercel env add DB_USER production "postgres.xihxdifufmlsonaegyyi"
+call npx vercel env add DB_PASSWORD production "tYOLpt6uyIHl"
 call npx vercel env add DB_NAME production "postgres"
 
 # Better Auth

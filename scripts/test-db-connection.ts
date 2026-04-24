@@ -12,7 +12,7 @@ const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    ssl: {
+    ssl: process.env.DB_SSL === 'false' ? false : {
         rejectUnauthorized: false // Supabase often needs this for pooler connections unless CA is set up
     }
 };
